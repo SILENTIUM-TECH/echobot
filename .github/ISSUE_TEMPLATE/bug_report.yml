@@ -1,0 +1,86 @@
+name: Bug Report
+description: Something isn't working as expected
+title: "[Bug] "
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Before reporting: check [FAQ.md](../../docs/FAQ.md) and [PAIRING.md](../../docs/PAIRING.md) — many common issues are documented there.
+
+        For **security vulnerabilities**, do not open an issue — see [SECURITY.md](../../SECURITY.md).
+
+  - type: dropdown
+    id: area
+    attributes:
+      label: Area
+      description: Which part of Echo is affected?
+      options:
+        - Pairing / connection
+        - OBLIVION AI agent
+        - A specific command (specify below)
+        - Group moderation
+        - Downloads / media
+        - Web dashboard
+        - Telegram bot panel
+        - Phase 2 feature
+        - Phase 3 feature
+        - Other
+    validations:
+      required: true
+
+  - type: input
+    id: command
+    attributes:
+      label: Command (if applicable)
+      description: Which command triggered the bug?
+      placeholder: ".sticker, .spy, .oblivion on, etc."
+
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: What happened?
+      description: Describe the bug. What did you do, what did you expect, what actually happened?
+      placeholder: |
+        1. I sent `.sticker` replying to a video
+        2. Echo replied "Processing..." but nothing else arrived
+        3. Expected: a sticker was created and sent back
+    validations:
+      required: true
+
+  - type: textarea
+    id: reproduce
+    attributes:
+      label: Steps to reproduce
+      description: Exact steps to reproduce the bug
+      placeholder: |
+        1. Go to a group where Echo is active
+        2. Reply to a short video with `.sticker`
+        3. Wait 30 seconds
+        4. Nothing received
+    validations:
+      required: true
+
+  - type: dropdown
+    id: hosting
+    attributes:
+      label: How are you using Echo?
+      options:
+        - Hosted version (echowabot.eu.org)
+        - Self-hosted on my own server
+        - Paired via Telegram bot
+    validations:
+      required: true
+
+  - type: input
+    id: version
+    attributes:
+      label: Version
+      description: Which version? (shown in `.menu` or the banner)
+      placeholder: "V20|26"
+
+  - type: textarea
+    id: context
+    attributes:
+      label: Additional context
+      description: Any other information that might help — error messages, screenshots, frequency of the bug, etc.

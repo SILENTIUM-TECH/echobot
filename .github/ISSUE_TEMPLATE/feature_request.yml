@@ -1,0 +1,73 @@
+name: Feature Request
+description: Suggest a new command, improvement, or capability
+title: "[Feature] "
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Feature requests are read and considered — not all are implemented, but all are appreciated. Be specific: the more concrete the idea, the easier it is to evaluate.
+
+        Check [COMMANDS.md](../../docs/COMMANDS.md) first — the feature you want may already exist.
+
+  - type: dropdown
+    id: type
+    attributes:
+      label: Type of request
+      options:
+        - New command
+        - Improvement to existing command
+        - OBLIVION AI agent capability
+        - Group management feature
+        - Download / media feature
+        - Dashboard / web panel feature
+        - Telegram bot panel feature
+        - Intelligence / OSINT feature
+        - Cryptography feature
+        - Other
+    validations:
+      required: true
+
+  - type: textarea
+    id: summary
+    attributes:
+      label: What do you want?
+      description: Describe the feature clearly. What command, what it does, how you'd use it.
+      placeholder: |
+        A `.transcribe` command that converts voice notes to text. You'd reply to any voice message with `.transcribe` and Echo sends back a text version of what was said.
+    validations:
+      required: true
+
+  - type: textarea
+    id: why
+    attributes:
+      label: Why is this useful?
+      description: Who would use this and when? What problem does it solve?
+      placeholder: |
+        Voice notes are common in our groups but some members can't listen to audio at work. A transcription would let everyone follow along.
+    validations:
+      required: true
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives you've considered
+      description: Any workarounds you currently use, or similar features elsewhere?
+
+  - type: dropdown
+    id: permission
+    attributes:
+      label: Suggested permission level
+      description: Who should be able to use this?
+      options:
+        - Member (everyone)
+        - Admin (group admins only)
+        - Owner (bot owners)
+        - Premium (paid users)
+        - Not sure
+
+  - type: textarea
+    id: context
+    attributes:
+      label: Additional context
+      description: Anything else that would help — use cases, examples, similar tools, technical notes.
