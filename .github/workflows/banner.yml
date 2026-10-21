@@ -1,0 +1,51 @@
+name: Refresh holiday banner
+
+# Rebuilds assets/banner.svg every day so the README banner always matches the
+# nearest event (30 days before, through 2 days after) of the home country.
+# Set the BANNER_COUNTRY repository variable (Settings > Secrets and variables >
+# Actions > Variables) to a two-letter code such as UG, KE, NG or US.
+
+on:
+  schedule:
+    - cron: "10 0 * * *"
+  workflow_dispatch:
+    inputs:
+      country:
+        description: "Two-letter country code (blank = repository variable or UG)"
+        required: false
+      date:
+        description: "Preview a day, YYYY-MM-DD (blank = today)"
+        required: false
+
+permissions:
+  contents: write
+
+jobs:
+  banner:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Build banner
+        env:
+          BANNER_COUNTRY: ${{ github.event.inputs.country || vars.BANNER_COUNTRY || 'UG' }}
+          BANNER_DATE: ${{ github.event.inputs.date }}
+        run: |
+          if [ -n "$BANNER_DATE" ]; then
+            node scripts/build-banner.js --country "$BANNER_COUNTRY" --date "$BANNER_DATE"
+          else
+            node scripts/build-banner.js --country "$BANNER_COUNTRY"
+          fi
+      - name: Commit if changed
+        run: |
+          if [ -n "$(git status --porcelain assets/banner.svg)" ]; then
+            git config user.name "echo-banner[bot]"
+            git config user.email "echo-banner@users.noreply.github.com"
+            git add assets/banner.svg
+            git commit -m "banner: refresh for $(date -u +%F)"
+            git push
+          else
+            echo "Banner unchanged."
+          fi
