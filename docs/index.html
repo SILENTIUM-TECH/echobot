@@ -1,0 +1,231 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Echo · the WhatsApp bot that feels alive</title>
+<meta name="description" content="Echo is a multi-device WhatsApp bot that runs your groups, downloads your media, protects your privacy and answers in plain language.">
+<meta name="theme-color" content="#070a16">
+<style>
+  :root{--bg:#070a16;--fg:#f4f7ff;--mut:#aab3cf;--acc:#45dfbd;--vio:#7c5cff;--glass:rgba(255,255,255,.08);--line:rgba(255,255,255,.22)}
+  *{box-sizing:border-box}
+  html,body{margin:0}
+  body{min-height:100vh;background:radial-gradient(1200px 700px at 15% -10%,#1b1450 0%,transparent 60%),radial-gradient(900px 600px at 100% 10%,#06352f 0%,transparent 55%),var(--bg);color:var(--fg);font-family:ui-rounded,"SF Pro Rounded","Segoe UI Variable Display","Segoe UI",system-ui,-apple-system,Roboto,sans-serif;line-height:1.5;padding:20px}
+  main{max-width:1180px;margin:0 auto}
+  header.bar{display:flex;gap:10px;flex-wrap:wrap;align-items:center;justify-content:space-between;margin-bottom:16px}
+  .brand{font-weight:800;letter-spacing:.18em}
+  .controls{display:flex;gap:8px;flex-wrap:wrap}
+  .pill,select,button.pill{appearance:none;border:1px solid var(--line);background:var(--glass);color:var(--fg);padding:9px 16px;border-radius:999px;font:inherit;font-size:14px;backdrop-filter:blur(18px) saturate(1.5);-webkit-backdrop-filter:blur(18px) saturate(1.5);cursor:pointer}
+  select option{color:#111}
+  .pill:hover,select:hover{border-color:var(--acc)}
+  #sound[aria-pressed="true"]{background:linear-gradient(135deg,var(--acc),var(--vio));border-color:transparent;color:#04110e;font-weight:700}
+  #stage{border-radius:28px;overflow:hidden;box-shadow:0 30px 80px rgba(0,0,0,.55),0 0 0 1px var(--line);cursor:pointer;touch-action:manipulation}
+  #stage svg{display:block;width:100%;height:auto}
+  .info{margin:14px 4px 0;color:var(--mut);font-size:14px;min-height:22px}
+  .hero{margin:34px 4px 10px;text-align:center}
+  .hero h1{font-size:clamp(28px,5vw,48px);margin:0 0 10px;letter-spacing:-.01em}
+  .hero p{margin:0 auto 22px;max-width:660px;color:var(--mut);font-size:clamp(16px,2.2vw,19px)}
+  .cta{display:flex;gap:12px;flex-wrap:wrap;justify-content:center}
+  .cta a{padding:13px 22px;border-radius:999px;text-decoration:none;font-weight:700;color:var(--fg);border:1px solid var(--line);background:var(--glass);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px)}
+  .cta a.main{background:linear-gradient(135deg,var(--acc),var(--vio));color:#04110e;border-color:transparent}
+  .cta a:hover{transform:translateY(-2px)}
+  footer{margin:40px 0 10px;text-align:center;color:var(--mut);font-size:13px}
+  footer a{color:var(--acc)}
+  [dir="rtl"] .controls{flex-direction:row-reverse}
+  @media (prefers-reduced-motion:reduce){.cta a:hover{transform:none}}
+</style>
+</head>
+<body>
+<main>
+  <header class="bar">
+    <div class="brand">ECHO</div>
+    <div class="controls">
+      <button id="sound" class="pill" aria-pressed="false" type="button"></button>
+      <select id="country" aria-label="Country"></select>
+      <select id="lang" aria-label="Language"></select>
+    </div>
+  </header>
+
+  <div id="stage" role="img" aria-live="polite"></div>
+  <div class="info" id="info"></div>
+
+  <section class="hero">
+    <h1 id="h1"></h1>
+    <p id="sub"></p>
+    <div class="cta">
+      <a class="main" id="c1" href="https://t.me/devaura_echobot"></a>
+      <a id="c2" href="https://echowabot.vercel.app"></a>
+      <a id="c3" href="https://github.com/SILENTIUM-TECH/echobot#readme"></a>
+    </div>
+  </section>
+
+  <footer>Echo · v10 · Built on Baileys · <a href="https://echowabot.vercel.app">echowabot.vercel.app</a><br>Not affiliated with WhatsApp or Meta.</footer>
+</main>
+
+<script src="banner-engine.js"></script>
+<script>
+(function () {
+  'use strict';
+  var T = {
+    en: { n: 'English', h1: 'WhatsApp, minus the busywork.', sub: 'Echo runs your groups, grabs your downloads, protects your privacy and answers in plain language, right inside the chats you already use.', c1: 'Pair on Telegram', c2: 'Open dashboard', c3: 'Read the docs', on: 'Alien audio: on', off: 'Alien audio: off', show: 'Showing', none: 'No holiday right now. Enjoy the aurora.', tip: 'Tap the banner to send a signal.', in: 'in', days: 'days', today: 'today', ago: 'days ago' },
+    sw: { n: 'Kiswahili', h1: 'WhatsApp bila usumbufu.', sub: 'Echo husimamia vikundi vyako, hupakua media, hulinda faragha yako na hujibu kwa lugha ya kawaida, ndani ya mazungumzo unayotumia tayari.', c1: 'Unganisha kupitia Telegram', c2: 'Fungua dashibodi', c3: 'Soma nyaraka', on: 'Sauti ya kigeni: imewashwa', off: 'Sauti ya kigeni: imezimwa', show: 'Inaonyesha', none: 'Hakuna sikukuu kwa sasa. Furahia mwangaza wa aurora.', tip: 'Gusa bango kutuma ishara.', in: 'baada ya', days: 'siku', today: 'leo', ago: 'siku zilizopita' },
+    fr: { n: 'Français', h1: 'WhatsApp, sans la corvée.', sub: "Echo gère vos groupes, télécharge vos médias, protège votre vie privée et répond en langage naturel, directement dans vos conversations.", c1: 'Associer via Telegram', c2: 'Ouvrir le tableau de bord', c3: 'Lire la documentation', on: 'Audio extraterrestre : activé', off: 'Audio extraterrestre : désactivé', show: 'Affichage', none: "Pas de fête en ce moment. Profitez de l'aurore.", tip: 'Touchez la bannière pour envoyer un signal.', in: 'dans', days: 'jours', today: "aujourd'hui", ago: 'jours' },
+    es: { n: 'Español', h1: 'WhatsApp, sin el trabajo pesado.', sub: 'Echo administra tus grupos, descarga tus archivos, protege tu privacidad y responde en lenguaje natural, dentro de los chats que ya usas.', c1: 'Vincular por Telegram', c2: 'Abrir el panel', c3: 'Leer la documentación', on: 'Audio alienígena: activado', off: 'Audio alienígena: apagado', show: 'Mostrando', none: 'Sin festividad por ahora. Disfruta de la aurora.', tip: 'Toca el banner para enviar una señal.', in: 'en', days: 'días', today: 'hoy', ago: 'días' },
+    pt: { n: 'Português', h1: 'WhatsApp, sem o trabalho chato.', sub: 'O Echo cuida dos seus grupos, baixa suas mídias, protege sua privacidade e responde em linguagem natural, dentro das conversas que você já usa.', c1: 'Conectar pelo Telegram', c2: 'Abrir o painel', c3: 'Ler a documentação', on: 'Áudio alienígena: ligado', off: 'Áudio alienígena: desligado', show: 'Exibindo', none: 'Nenhum feriado agora. Aproveite a aurora.', tip: 'Toque no banner para enviar um sinal.', in: 'em', days: 'dias', today: 'hoje', ago: 'dias' },
+    ar: { n: 'العربية', h1: 'واتساب بلا عناء.', sub: 'يدير Echo مجموعاتك، ويحمّل وسائطك، ويحمي خصوصيتك، ويجيب بلغة بسيطة، داخل المحادثات التي تستخدمها أصلاً.', c1: 'اربط عبر تيليجرام', c2: 'افتح لوحة التحكم', c3: 'اقرأ التوثيق', on: 'الصوت الفضائي: يعمل', off: 'الصوت الفضائي: متوقف', show: 'يعرض', none: 'لا توجد مناسبة الآن. استمتع بالشفق.', tip: 'المس الشعار لإرسال إشارة.', in: 'بعد', days: 'يوم', today: 'اليوم', ago: 'يوم مضى', rtl: true },
+    hi: { n: 'हिन्दी', h1: 'WhatsApp, बिना झंझट के।', sub: 'Echo आपके ग्रुप संभालता है, मीडिया डाउनलोड करता है, आपकी प्राइवेसी बचाता है और आम भाषा में जवाब देता है, उन्हीं चैट में जिनका आप पहले से इस्तेमाल करते हैं।', c1: 'Telegram से जोड़ें', c2: 'डैशबोर्ड खोलें', c3: 'डॉक्स पढ़ें', on: 'एलियन ऑडियो: चालू', off: 'एलियन ऑडियो: बंद', show: 'दिखा रहे हैं', none: 'अभी कोई त्योहार नहीं। अरोरा का आनंद लें।', tip: 'सिग्नल भेजने के लिए बैनर पर टैप करें।', in: 'में', days: 'दिन', today: 'आज', ago: 'दिन पहले' },
+    id: { n: 'Bahasa Indonesia', h1: 'WhatsApp tanpa repot.', sub: 'Echo mengelola grup Anda, mengunduh media, menjaga privasi, dan menjawab dengan bahasa sehari-hari, langsung di obrolan yang sudah Anda pakai.', c1: 'Sambungkan lewat Telegram', c2: 'Buka dasbor', c3: 'Baca dokumentasi', on: 'Audio alien: aktif', off: 'Audio alien: mati', show: 'Menampilkan', none: 'Belum ada hari raya. Nikmati auroranya.', tip: 'Ketuk banner untuk mengirim sinyal.', in: 'dalam', days: 'hari', today: 'hari ini', ago: 'hari lalu' },
+    tr: { n: 'Türkçe', h1: 'WhatsApp, angarya olmadan.', sub: 'Echo gruplarınızı yönetir, medyalarınızı indirir, gizliliğinizi korur ve zaten kullandığınız sohbetlerde sade bir dille yanıt verir.', c1: "Telegram'dan bağla", c2: 'Paneli aç', c3: 'Belgeleri oku', on: 'Uzaylı sesi: açık', off: 'Uzaylı sesi: kapalı', show: 'Gösterilen', none: 'Şu an özel bir gün yok. Auroranın tadını çıkarın.', tip: 'Sinyal göndermek için bannera dokunun.', in: 'şu kadar sonra:', days: 'gün', today: 'bugün', ago: 'gün önce' },
+    ru: { n: 'Русский', h1: 'WhatsApp без рутины.', sub: 'Echo управляет вашими группами, скачивает медиа, защищает вашу приватность и отвечает простым языком, прямо в привычных чатах.', c1: 'Подключить через Telegram', c2: 'Открыть панель', c3: 'Читать документацию', on: 'Инопланетный звук: включён', off: 'Инопланетный звук: выключен', show: 'Показано', none: 'Сейчас нет праздников. Любуйтесь северным сиянием.', tip: 'Нажмите на баннер, чтобы отправить сигнал.', in: 'через', days: 'дн.', today: 'сегодня', ago: 'дн. назад' },
+    zh: { n: '中文', h1: 'WhatsApp，省心又轻松。', sub: 'Echo 帮你管理群组、下载媒体、保护隐私，并用日常语言回答，一切都在你熟悉的聊天里完成。', c1: '通过 Telegram 配对', c2: '打开控制台', c3: '阅读文档', on: '外星音效：开', off: '外星音效：关', show: '正在显示', none: '目前没有节日。欣赏极光吧。', tip: '点击横幅发送信号。', in: '还有', days: '天', today: '今天', ago: '天前' }
+  };
+
+  var q = new URLSearchParams(location.search);
+  var tz = ''; try { tz = Intl.DateTimeFormat().resolvedOptions().timeZone; } catch (e) {}
+  var lang0 = (q.get('lang') || (navigator.language || 'en').slice(0, 2)).toLowerCase();
+  var st = { lang: T[lang0] ? lang0 : 'en', country: (q.get('country') || EchoBanner.detectCountry(tz, navigator.language) || 'UG').toUpperCase(), date: q.get('date') };
+
+  var $ = function (id) { return document.getElementById(id); };
+  var stage = $('stage'), info = $('info'), sound = $('sound');
+
+  // selects
+  Object.keys(T).forEach(function (k) { var o = document.createElement('option'); o.value = k; o.textContent = T[k].n; $('lang').appendChild(o); });
+  Object.keys(EchoBanner.COUNTRIES).sort(function (a, b) { return EchoBanner.COUNTRIES[a].name.localeCompare(EchoBanner.COUNTRIES[b].name); }).forEach(function (k) {
+    var o = document.createElement('option'); o.value = k; o.textContent = EchoBanner.COUNTRIES[k].name; $('country').appendChild(o);
+  });
+  if (!EchoBanner.COUNTRIES[st.country]) st.country = 'UG';
+  $('lang').value = st.lang; $('country').value = st.country;
+
+  function paint() {
+    var t = T[st.lang];
+    document.documentElement.lang = st.lang;
+    document.documentElement.dir = t.rtl ? 'rtl' : 'ltr';
+    $('h1').textContent = t.h1; $('sub').textContent = t.sub; $('c1').textContent = t.c1; $('c2').textContent = t.c2; $('c3').textContent = t.c3;
+    sound.textContent = sound.getAttribute('aria-pressed') === 'true' ? t.on : t.off;
+    var now = st.date ? new Date(st.date + 'T12:00:00Z') : new Date();
+    var out = EchoBanner.render({ code: st.country, now: now });
+    stage.innerHTML = out.svg;
+    stage.setAttribute('aria-label', 'Echo banner');
+    var svg = stage.querySelector('svg');
+    if (svg && window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches && svg.pauseAnimations) svg.pauseAnimations();
+    var c = EchoBanner.COUNTRIES[st.country];
+    if (out.event) {
+      var d = out.event.delta;
+      var when = d === 0 ? t.today : (d > 0 ? t.in + ' ' + d + ' ' + t.days : Math.abs(d) + ' ' + t.ago);
+      info.textContent = t.show + ': ' + out.event.label + ' · ' + c.name + ' · ' + when + '  ·  ' + t.tip;
+    } else {
+      info.textContent = c.name + ' · ' + t.none + '  ·  ' + t.tip;
+    }
+  }
+
+  $('lang').addEventListener('change', function () { st.lang = this.value; paint(); });
+  $('country').addEventListener('change', function () { st.country = this.value; paint(); });
+
+  /* ───────────── alien audio (Web Audio, no files) ───────────── */
+  var A = { ctx: null, master: null, delay: null, timer: null, on: false, nodes: [] };
+
+  function noiseBuffer(ctx) {
+    var b = ctx.createBuffer(1, ctx.sampleRate * 1.5, ctx.sampleRate), d = b.getChannelData(0);
+    for (var i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1;
+    return b;
+  }
+
+  function out(node, pan) {
+    var p = A.ctx.createStereoPanner ? A.ctx.createStereoPanner() : null;
+    if (p) { p.pan.value = pan || 0; node.connect(p); p.connect(A.master); p.connect(A.delay); }
+    else { node.connect(A.master); node.connect(A.delay); }
+  }
+
+  function glide(f0, f1, dur, vib, gain) {
+    var c = A.ctx, t = c.currentTime, o = c.createOscillator(), g = c.createGain(), l = c.createOscillator(), lg = c.createGain();
+    o.type = Math.random() > .5 ? 'sine' : 'triangle';
+    o.frequency.setValueAtTime(f0, t); o.frequency.exponentialRampToValueAtTime(f1, t + dur);
+    l.frequency.value = 6 + Math.random() * 9; lg.gain.value = vib; l.connect(lg); lg.connect(o.frequency);
+    g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(gain, t + dur * .25); g.gain.exponentialRampToValueAtTime(.0001, t + dur);
+    o.connect(g); out(g, Math.random() * 1.6 - .8); o.start(t); l.start(t); o.stop(t + dur + .05); l.stop(t + dur + .05);
+  }
+
+  function fm(base, ratio, depth, dur, gain, when) {
+    var c = A.ctx, t = c.currentTime + (when || 0), car = c.createOscillator(), mod = c.createOscillator(), mg = c.createGain(), g = c.createGain();
+    car.frequency.value = base; mod.frequency.value = base * ratio; mg.gain.value = depth; mod.connect(mg); mg.connect(car.frequency);
+    g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(gain, t + .01); g.gain.exponentialRampToValueAtTime(.0001, t + dur);
+    car.connect(g); out(g, Math.random() * 1.2 - .6); car.start(t); mod.start(t); car.stop(t + dur + .05); mod.stop(t + dur + .05);
+  }
+
+  function ring(f, dur, gain) {
+    var c = A.ctx, t = c.currentTime, a = c.createOscillator(), b = c.createOscillator(), m = c.createGain(), g = c.createGain();
+    a.type = 'sawtooth'; a.frequency.setValueAtTime(f, t); a.frequency.exponentialRampToValueAtTime(f * (Math.random() > .5 ? 2.6 : .35), t + dur);
+    b.frequency.value = 55 + Math.random() * 160; m.gain.value = 0; b.connect(m.gain); a.connect(m);
+    g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(gain, t + .05); g.gain.exponentialRampToValueAtTime(.0001, t + dur);
+    m.connect(g); out(g, Math.random() * 2 - 1); a.start(t); b.start(t); a.stop(t + dur); b.stop(t + dur);
+  }
+
+  function whoosh(dur, gain) {
+    var c = A.ctx, t = c.currentTime, s = c.createBufferSource(), f = c.createBiquadFilter(), g = c.createGain();
+    s.buffer = noiseBuffer(c); f.type = 'bandpass'; f.Q.value = 6; f.frequency.setValueAtTime(220, t); f.frequency.exponentialRampToValueAtTime(3600, t + dur);
+    g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(gain, t + dur * .4); g.gain.linearRampToValueAtTime(0, t + dur);
+    s.connect(f); f.connect(g); out(g, Math.random() * 2 - 1); s.start(t); s.stop(t + dur);
+  }
+
+  var SCALE = [196, 233.1, 261.6, 311.1, 349.2, 415.3, 466.2, 622.3, 740, 932];
+  function transmission() {
+    var n = 5 + Math.floor(Math.random() * 4);
+    for (var i = 0; i < n; i++) fm(SCALE[Math.floor(Math.random() * SCALE.length)] * (Math.random() > .6 ? 2 : 1), 1.4 + Math.random() * 2.4, 120 + Math.random() * 240, .12 + Math.random() * .1, .07, i * .11);
+  }
+
+  function chirp() {
+    var r = Math.random();
+    if (r < .3) glide(900 + Math.random() * 500, 180 + Math.random() * 120, .6 + Math.random() * .8, 25 + Math.random() * 40, .1);
+    else if (r < .55) glide(260 + Math.random() * 120, 1300 + Math.random() * 900, .5 + Math.random() * .6, 18 + Math.random() * 30, .09);
+    else if (r < .75) ring(180 + Math.random() * 300, .7 + Math.random() * .6, .08);
+    else if (r < .9) transmission();
+    else whoosh(1.1 + Math.random() * .8, .12);
+    A.timer = setTimeout(chirp, 1600 + Math.random() * 3400);
+  }
+
+  function startAudio() {
+    var Ctx = window.AudioContext || window.webkitAudioContext; if (!Ctx) return false;
+    A.ctx = A.ctx || new Ctx();
+    if (A.ctx.state === 'suspended') A.ctx.resume();
+    var c = A.ctx;
+    A.master = c.createGain(); A.master.gain.value = 0; A.master.connect(c.destination);
+    A.delay = c.createDelay(1.5); A.delay.delayTime.value = .38;
+    var fb = c.createGain(); fb.gain.value = .4;
+    var lp = c.createBiquadFilter(); lp.type = 'lowpass'; lp.frequency.value = 2200;
+    A.delay.connect(lp); lp.connect(fb); fb.connect(A.delay); lp.connect(A.master);
+    // slow, detuned drone with a wobbling filter
+    var f = c.createBiquadFilter(); f.type = 'lowpass'; f.frequency.value = 420; f.Q.value = 5;
+    var lfo = c.createOscillator(), lg = c.createGain(); lfo.frequency.value = .11; lg.gain.value = 260; lfo.connect(lg); lg.connect(f.frequency); lfo.start();
+    var d1 = c.createOscillator(), d2 = c.createOscillator(), dg = c.createGain();
+    d1.type = 'sawtooth'; d2.type = 'sawtooth'; d1.frequency.value = 55; d2.frequency.value = 55.7; dg.gain.value = .25;
+    d1.connect(dg); d2.connect(dg); dg.connect(f); f.connect(A.master); d1.start(); d2.start();
+    A.nodes = [d1, d2, lfo];
+    A.master.gain.linearRampToValueAtTime(.2, c.currentTime + 1.6);
+    A.timer = setTimeout(chirp, 700);
+    return true;
+  }
+
+  function stopAudio() {
+    clearTimeout(A.timer);
+    if (!A.ctx || !A.master) return;
+    var c = A.ctx, m = A.master, nodes = A.nodes;
+    m.gain.cancelScheduledValues(c.currentTime); m.gain.setValueAtTime(m.gain.value, c.currentTime); m.gain.linearRampToValueAtTime(0, c.currentTime + .6);
+    setTimeout(function () { nodes.forEach(function (n) { try { n.stop(); } catch (e) {} }); try { m.disconnect(); } catch (e) {} }, 800);
+  }
+
+  sound.addEventListener('click', function () {
+    var on = sound.getAttribute('aria-pressed') !== 'true';
+    if (on && !startAudio()) return;
+    if (!on) stopAudio();
+    sound.setAttribute('aria-pressed', on ? 'true' : 'false'); A.on = on; paint();
+  });
+  stage.addEventListener('click', function () { if (A.on) { transmission(); ring(300, .8, .08); } });
+  stage.addEventListener('pointerenter', function () { if (A.on) glide(300, 1200, .5, 20, .08); });
+  document.addEventListener('visibilitychange', function () { if (document.hidden && A.on) { sound.click(); } });
+
+  sound.setAttribute('aria-pressed', 'false');
+  paint();
+})();
+</script>
+</body>
+</html>
